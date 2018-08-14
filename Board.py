@@ -8,6 +8,7 @@ class Board:
         #self.state = list(range(N))
         #shuffle(self.state)
         self.board_size = N
+        self.max_FF = N*(N-1)/2
         self.state = [randint(0,self.board_size-1) for _ in range(self.board_size)]
 
     def printState(self):
@@ -19,6 +20,12 @@ class Board:
             board += blank
 
         print(board)
+
+    def solFound(self):
+        if self.fitnessFunction()==0:
+            return(True)
+        else:
+            return(False)
 
 
     def mutate(self):

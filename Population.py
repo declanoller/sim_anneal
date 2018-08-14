@@ -19,7 +19,6 @@ class Population:
     def __init__(self,individ_class,**kwargs):
 
 
-        self.T = 100
 
         self.kwargs_str = '__'.join(['{}={}'.format(x[0],x[1]) for x in kwargs.items()])
         print(self.kwargs_str)
@@ -29,6 +28,9 @@ class Population:
         print('using',self.class_name,'class')
 
         self.state = self.individ_class(**kwargs)
+        self.init_T = .015*self.state.max_FF
+        self.T = self.init_T
+        self.T_decrease_rate = 0.995
 
         self.FF = []
         self.FF.append(self.state.fitnessFunction())
@@ -49,10 +51,17 @@ class Population:
             if exp(-(new_FF - cur_FF)/self.T) > random():
                 self.state = new_state
 
-        self.FF.append(self.state.fitnessFunction())
+        new_FF = self.state.fitnessFunction()
+        self.FF.append(new_FF)
+        self.T = self.T_decrease_rate*self.T
+        print('T = {:.3f}, FF = {:.3f}'.format(self.T,new_FF))
 
 
-    def plotEvolve(self,generations = 550,state_plot_obj = None):
+    def resetTemp(self):
+        print('reset temp!')
+        self.T = self.init_T
+
+    def plotEvolve(self,generations = 550,state_plot_obj = None,reset_marker = 1000000):
 
         if state_plot_obj is None:
             fig = plt.figure()
@@ -67,14 +76,11 @@ class Population:
         found = False
         gen = []
 
+        method_list = [func for func in dir(self.individ_class) if callable(getattr(self.individ_class, func))]
+
         for i in range(generations):
 
             gen.append(i)
-
-            '''if cur_best==0 and not found:
-                print('found solution in generation {}!\n'.format(i))
-                self.sorted_population[0][0].printState()
-                found = True'''
 
             axis.clear()
             axis.set_xlabel('# generations')
@@ -85,11 +91,22 @@ class Population:
             #axis.text(.6*i,.8*max(best),'best: {:.3f}\nmean: {:.3f}'.format(cur_best,cur_mean))
 
             if state_plot_obj is not None:
-                state_plot_obj.copyState(self.sorted_population[0][0])
+                state_plot_obj.copyState(self.state)
                 state_plot_obj.plotState(plot_axis=axes[1])
 
 
             fig.canvas.draw()
+
+            if 'solFound' in method_list:
+                if self.state.solFound():
+                    print('found solution in generation {}!\n'.format(i))
+                    if 'printState' in method_list:
+                        self.state.printState()
+                    break
+
+
+            if i%reset_marker==0:
+                self.resetTemp()
 
             self.step()
 
