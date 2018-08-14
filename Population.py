@@ -28,7 +28,7 @@ class Population:
         print('using',self.class_name,'class')
 
         self.state = self.individ_class(**kwargs)
-        self.init_T = .015*self.state.max_FF
+        self.init_T = .035*self.state.max_FF
         self.T = self.init_T
         self.T_decrease_rate = 0.995
 
