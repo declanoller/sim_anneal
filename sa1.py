@@ -1,8 +1,27 @@
+import sys
+sys.path.append('../IndividualClasses')
+
 from Population import Population
 from Board import Board
 from Brachistochrone import Brachistochrone
 from Skyscraper import Skyscraper
 
+
+
+
+
+
+Npts = 40
+height = 1.0
+
+b = Brachistochrone(N=Npts,height=height)
+b.getBrachistochroneSol()
+
+pop1 = Population(Brachistochrone,N=Npts,height=height)
+ending_state = pop1.plotEvolve(generations = 7000,state_plot_obj=b,reset_marker = 2000)
+
+
+exit(0)
 
 
 
@@ -24,16 +43,6 @@ pop1 = Population(Skyscraper,N=8,see_list=med_88_SS,const_list=med_88_constlist)
 ending_state = pop1.plotEvolve(generations = 10000,reset_marker = 2000)
 #s.countOccurrences()
 
-exit(0)
-
-Npts = 40
-height = 1.0
-
-b = Brachistochrone(N=Npts,height=height)
-b.getBrachistochroneSol()
-
-pop1 = Population(Brachistochrone,N=Npts,height=height)
-ending_state = pop1.plotEvolve(generations = 7000,state_plot_obj=b,reset_marker = 2000)
 
 
 pop = Population(Board,N=30)
