@@ -12,7 +12,7 @@ from Skyscraper import Skyscraper
 
 
 Npts = 40
-height = 1.0
+height = .3
 
 b = Brachistochrone(N=Npts,height=height)
 b.getBrachistochroneSol()
