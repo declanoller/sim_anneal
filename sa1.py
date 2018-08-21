@@ -11,7 +11,7 @@ from Skyscraper import Skyscraper
 
 
 
-Npts = 40
+Npts = 25
 height = .3
 
 b = Brachistochrone(N=Npts,height=height)

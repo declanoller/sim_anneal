@@ -28,7 +28,7 @@ class Population:
         print('using',self.class_name,'class')
 
         self.state = self.individ_class(**kwargs)
-        self.init_T = .035*self.state.max_FF
+        self.init_T = .015*self.state.max_FF
         self.T = self.init_T
         self.T_decrease_rate = 0.995
 
@@ -91,6 +91,7 @@ class Population:
             #axis.text(.6*i,.8*max(best),'best: {:.3f}\nmean: {:.3f}'.format(cur_best,cur_mean))
 
             if state_plot_obj is not None:
+                axes[1].clear()
                 state_plot_obj.copyState(self.state)
                 state_plot_obj.plotState(plot_axis=axes[1])
 
