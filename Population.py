@@ -3,7 +3,8 @@ from time import sleep
 from random import randint,random
 from copy import deepcopy
 from datetime import datetime
-from math import exp
+from math import exp,floor,ceil
+from statistics import mean
 
 '''
 The object must have the following functions or attributes:
@@ -28,13 +29,16 @@ class Population:
         print('using',self.class_name,'class')
 
         self.state = self.individ_class(**kwargs)
-        self.init_T = .015*self.state.max_FF
+        '''self.init_T = .015*self.state.max_FF
+        self.T = self.init_T'''
+        self.T_scale = .01*self.state.max_FF
+        self.init_T = 1.0
         self.T = self.init_T
-        self.T_decrease_rate = 0.995
+        self.T_decrease_rate = 0.99
 
         self.FF = []
         self.FF.append(self.state.fitnessFunction())
-
+        self.mut_accepted = [1]
 
     def step(self):
 
@@ -42,19 +46,26 @@ class Population:
 
         new_state.mutate()
 
-        cur_FF = self.state.fitnessFunction()
+        cur_FF = self.FF[-1]
         new_FF = new_state.fitnessFunction()
+        next_FF = cur_FF
+
+        accepted = 0
 
         if new_FF < cur_FF:
             self.state = new_state
+            next_FF = new_FF
+            accepted = 1
         else:
-            if exp(-(new_FF - cur_FF)/self.T) > random():
+            if exp(-(new_FF - cur_FF)/(self.T*self.T_scale)) > random():
                 self.state = new_state
+                next_FF = new_FF
+                accepted = 1
 
-        new_FF = self.state.fitnessFunction()
-        self.FF.append(new_FF)
+        self.mut_accepted.append(accepted)
+        self.FF.append(next_FF)
         self.T = self.T_decrease_rate*self.T
-        print('T = {:.3f}, FF = {:.3f}'.format(self.T,new_FF))
+        print('T = {:.3f}, FF = {:.3f}'.format(self.T,next_FF))
 
 
     def resetTemp(self):
@@ -71,24 +82,44 @@ class Population:
             fig, axes = plt.subplots(2,1,figsize=(8,10))
             axis = axes[0]
 
-        fig.show()
 
-        found = False
-        gen = []
+        axis_accepted = axis.twinx()
+        fig.show()
 
         method_list = [func for func in dir(self.individ_class) if callable(getattr(self.individ_class, func))]
 
+        found = False
+        gen = []
+        accepted_window = []
+        Ts = []
+        moving_window_percent = .10
+
         for i in range(generations):
 
+            accepted_moving_window = max(1,floor(i*moving_window_percent))
+
             gen.append(i)
+            accepted_window.append(mean(self.mut_accepted[-accepted_moving_window:]))
+            Ts.append(self.T)
 
             axis.clear()
+            axis_accepted.clear()
             axis.set_xlabel('# generations')
             axis.set_ylabel('fitness function')
+
+
             axis.plot(gen,self.FF,label='FF')
+
+            axis_accepted.set_ylabel('% of last {:.2f} mut. accepted'.format(moving_window_percent))
+            axis_accepted.plot(gen,accepted_window,label='accepted',color='darkred')
+            axis_accepted.plot(gen,Ts,label='T',color='olivedrab')
+
+            axis.set_title('T = {:.3E}, Last {} muts'.format(self.T,accepted_moving_window))
+            '''axis.text(.6*i,.8*max(self.FF),'T = {}'.format(self.T))
+            axis.text(.6*i,.9*max(self.FF),'Last {} muts'.format(accepted_moving_window))'''
+
             axis.legend()
 
-            #axis.text(.6*i,.8*max(best),'best: {:.3f}\nmean: {:.3f}'.format(cur_best,cur_mean))
 
             if state_plot_obj is not None:
                 axes[1].clear()

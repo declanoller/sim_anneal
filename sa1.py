@@ -10,6 +10,14 @@ from Skyscraper import Skyscraper
 
 
 
+easy_SS = [[2,1,3,2],[2,2,1,3],[2,3,1,3],[3,1,2,2]]
+
+pop1 = Population(Skyscraper,N=4,see_list=easy_SS)
+ending_state = pop1.plotEvolve(generations = 10000,reset_marker = 2000)
+
+
+
+exit(0)
 
 Npts = 25
 height = .3
@@ -18,10 +26,9 @@ b = Brachistochrone(N=Npts,height=height)
 b.getBrachistochroneSol()
 
 pop1 = Population(Brachistochrone,N=Npts,height=height)
-ending_state = pop1.plotEvolve(generations = 7000,state_plot_obj=b,reset_marker = 2000)
+ending_state = pop1.plotEvolve(generations = 7000,state_plot_obj=b)
 
-
-exit(0)
+#,reset_marker = 2000
 
 
 
