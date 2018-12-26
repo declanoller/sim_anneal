@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../IndividualClasses')
 
-from Population import Population
+from SimAnneal import SimAnneal
 from Board import Board
 from Brachistochrone import Brachistochrone
 from Skyscraper import Skyscraper
@@ -12,13 +12,10 @@ from Skyscraper import Skyscraper
 
 
 Npts = 25
-height = .3
+height = 1.3
 
-b = Brachistochrone(N=Npts,height=height)
-b.getBrachistochroneSol()
-
-pop1 = Population(Brachistochrone,N=Npts,height=height)
-ending_state = pop1.plotEvolve(generations = 7000,state_plot_obj=b,reset_marker = 2000)
+sa1 = SimAnneal(Brachistochrone, N=Npts, height=height, init_T_factor=0.00001, mutate_strength_height_frac=0.015)
+ending_state = sa1.plotEvolve(N_gen = 6000, make_gif=True)
 
 
 exit(0)
